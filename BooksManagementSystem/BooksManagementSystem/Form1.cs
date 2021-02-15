@@ -24,13 +24,17 @@ namespace BooksManagementSystem
         private OleDbDataAdapter authorsAdapter;
         private DataTable authorsTable;
         private CurrencyManager authorsManager;
+        private OleDbCommandBuilder builderComm;
         private bool dbError = false;
         private enum State
         {
             View,
             Edit,
-            Add
+            Add,
+            Delete
         }
+
+        private State appState = State.View;
 
         private void frmAuthors_Load(object sender, EventArgs e)
         {
@@ -47,7 +51,7 @@ namespace BooksManagementSystem
                 authorsAdapter = new OleDbDataAdapter(authorsComm);
                 authorsTable = new DataTable();
                 authorsAdapter.Fill(authorsTable);
-                txtAuthorID.DataBindings.Add("Text", authorsTable, "AU_ID");
+                txtAuthorID.DataBindings.Add("Text", authorsTable, "AU_ID", true);
                 txtAuthorName.DataBindings.Add("Text", authorsTable, "Author");
                 txtAuthorBorn.DataBindings.Add("Text", authorsTable, "Year_Born");
                 authorsManager = (CurrencyManager)BindingContext[authorsTable];
@@ -88,6 +92,26 @@ namespace BooksManagementSystem
             {
                 try
                 {
+                    authorsManager.EndCurrentEdit();
+                    builderComm = new OleDbCommandBuilder(authorsAdapter);
+                    if (appState == State.Edit)
+                    {
+                        var authRow = authorsTable.Select("AU_ID = " + txtAuthorID.Text);
+                        if (String.IsNullOrEmpty(txtAuthorBorn.Text))
+                            authRow[0]["Year_Born"] = DBNull.Value;
+                        else
+                            authRow[0]["Year_Born"] = txtAuthorBorn.Text;
+                        authorsAdapter.Update(authorsTable);
+                        txtAuthorBorn.DataBindings.Add("Text", authorsTable, "Year_Born");
+                    }
+                    else if (appState == State.Add)
+                    {
+                        var savedRecord = txtAuthorName.Text;
+                        authorsTable.DefaultView.Sort = "Author";
+                        authorsManager.Position = authorsTable.DefaultView.Find(savedRecord);
+                        authorsAdapter.Update(authorsTable);
+                    }
+
                     MessageBox.Show("Record Saved", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     setAppState(State.View);
                 }
@@ -95,7 +119,6 @@ namespace BooksManagementSystem
                 {
                     MessageBox.Show(ex.Message, "Record Saving Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
             }
         }
 
@@ -109,7 +132,10 @@ namespace BooksManagementSystem
 
             try
             {
-
+                authorsManager.RemoveAt(authorsManager.Position);
+                builderComm = new OleDbCommandBuilder(authorsAdapter);
+                authorsAdapter.Update(authorsTable);
+                appState = State.Delete;
             }
             catch (Exception ex)
             {
@@ -119,6 +145,7 @@ namespace BooksManagementSystem
 
         private void setAppState(State appState)
         {
+            this.appState = appState;
             switch (appState)
             {
                 case State.View:
@@ -155,6 +182,7 @@ namespace BooksManagementSystem
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
+            txtAuthorBorn.DataBindings.Clear();
             setAppState(State.Edit);
         }
 
@@ -162,6 +190,7 @@ namespace BooksManagementSystem
         {
             try
             {
+                authorsManager.AddNew();
                 setAppState(State.Add);
             }
             catch (Exception ex)
@@ -232,6 +261,21 @@ namespace BooksManagementSystem
             {
                 txtAuthorBorn.Focus();
             }
+        }
+
+        private void btnFirst_Click(object sender, EventArgs e)
+        {
+            authorsManager.Position = 0;
+        }
+
+        private void btnLast_Click(object sender, EventArgs e)
+        {
+            authorsManager.Position = authorsManager.Count - 1;
+        }
+
+        private void btnDone_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace BooksManagementSystem
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmPublishers());
+            Application.Run(new frmAuthors());
         }
     }
 }
