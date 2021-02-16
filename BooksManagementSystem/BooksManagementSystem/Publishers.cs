@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BooksManagementSystem
@@ -24,12 +19,16 @@ namespace BooksManagementSystem
         private OleDbDataAdapter publishersAdapter;
         private DataTable publishersTable;
         private CurrencyManager publishersManager;
+        private OleDbCommandBuilder builderComm;
         private bool dbError = false;
+        private int CurrentPosition { get; set; }
 
         enum State
         {
-            Edit, Add, View
+            Edit, Add, View, Delete
         }
+
+        private State appState;
         private void frmPublishers_Load(object sender, EventArgs e)
         {
             try
@@ -91,6 +90,15 @@ namespace BooksManagementSystem
         {
             try
             {
+                txtName.DataBindings.Clear();
+                txtCompanyName.DataBindings.Clear();
+                txtAddress.DataBindings.Clear();
+                txtCity.DataBindings.Clear();
+                txtState.DataBindings.Clear();
+                txtZip.DataBindings.Clear();
+                txtTelephone.DataBindings.Clear();
+                txtFax.DataBindings.Clear();
+                txtComments.DataBindings.Clear();
                 setAppState(State.Edit);
             }
             catch (Exception ex)
@@ -102,6 +110,8 @@ namespace BooksManagementSystem
         {
             try
             {
+                CurrentPosition = publishersManager.Position;
+                publishersManager.AddNew();
                 setAppState(State.Add);
             }
             catch (Exception ex)
@@ -112,9 +122,12 @@ namespace BooksManagementSystem
 
         private void setAppState(State appState)
         {
+            this.appState = appState;
             switch (appState)
             {
                 case State.View:
+                    txtPublisherID.BackColor = Color.Gainsboro;
+                    txtPublisherID.ForeColor = Color.Black;
                     txtPublisherID.ReadOnly = true;
                     txtName.ReadOnly = true;
                     txtCompanyName.ReadOnly = true;
@@ -133,6 +146,10 @@ namespace BooksManagementSystem
                     btnAddNew.Enabled = true;
                     btnDelete.Enabled = true;
                     btnDone.Enabled = true;
+                    btnFirst.Enabled = true;
+                    btnLast.Enabled = true;
+                    btnSearch.Enabled = true;
+                    txtSearch.Enabled = true;
                     break;
                 default:
                     txtPublisherID.BackColor = Color.Red;
@@ -155,6 +172,10 @@ namespace BooksManagementSystem
                     btnAddNew.Enabled = false;
                     btnDelete.Enabled = false;
                     btnDone.Enabled = false;
+                    btnFirst.Enabled = false;
+                    btnLast.Enabled = false;
+                    btnSearch.Enabled = false;
+                    txtSearch.Enabled = false;
                     txtName.Focus();
                     break;
             }
@@ -163,7 +184,7 @@ namespace BooksManagementSystem
         private bool ValidateInput()
         {
             string message = "";
-            bool allOK = false;
+            bool allOK = true;
 
             if (txtName.Text.Trim().Equals(""))
             {
@@ -241,6 +262,23 @@ namespace BooksManagementSystem
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            publishersManager.CancelCurrentEdit();
+            if (appState == State.Edit)
+            {
+                txtName.DataBindings.Add("Text", publishersTable, "Name");
+                txtCompanyName.DataBindings.Add("Text", publishersTable, "Company_Name");
+                txtAddress.DataBindings.Add("Text", publishersTable, "Address");
+                txtCity.DataBindings.Add("Text", publishersTable, "City");
+                txtState.DataBindings.Add("Text", publishersTable, "State");
+                txtZip.DataBindings.Add("Text", publishersTable, "Zip");
+                txtTelephone.DataBindings.Add("Text", publishersTable, "Telephone");
+                txtFax.DataBindings.Add("Text", publishersTable, "FAX");
+                txtComments.DataBindings.Add("Text", publishersTable, "Comments");
+            }
+            else if (appState == State.Add)
+            {
+                publishersManager.Position = CurrentPosition;
+            }
             setAppState(State.View);
         }
 
@@ -250,9 +288,63 @@ namespace BooksManagementSystem
             {
                 if (ValidateInput())
                 {
+                    var savedRecord = txtName.Text;
+                    publishersManager.EndCurrentEdit();
+                    builderComm = new OleDbCommandBuilder(publishersAdapter);
+                    if (appState == State.Edit)
+                    {
+                        var currentRow = publishersTable.Select("PubID = " + txtPublisherID.Text);
+                        if (string.IsNullOrEmpty(txtName.Text))
+                            currentRow[0]["Name"] = DBNull.Value;
+                        else currentRow[0]["Name"] = txtName.Text;
+                        if (string.IsNullOrEmpty(txtCompanyName.Text))
+                            currentRow[0]["Company_Name"] = DBNull.Value;
+                        else currentRow[0]["Company_Name"] = txtCompanyName.Text;
+                        if (string.IsNullOrEmpty(txtAddress.Text))
+                            currentRow[0]["Address"] = DBNull.Value;
+                        else currentRow[0]["Address"] = txtAddress.Text;
+                        if (string.IsNullOrEmpty(txtCity.Text))
+                            currentRow[0]["City"] = DBNull.Value;
+                        else currentRow[0]["City"] = txtCity.Text;
+                        if (string.IsNullOrEmpty(txtState.Text))
+                            currentRow[0]["State"] = DBNull.Value;
+                        else currentRow[0]["State"] = txtState.Text;
+                        if (string.IsNullOrEmpty(txtZip.Text))
+                            currentRow[0]["Zip"] = DBNull.Value;
+                        else currentRow[0]["Zip"] = txtZip.Text;
+                        if (string.IsNullOrEmpty(txtTelephone.Text))
+                            currentRow[0]["Telephone"] = DBNull.Value;
+                        else currentRow[0]["Telephone"] = txtTelephone.Text;
+                        if (string.IsNullOrEmpty(txtFax.Text))
+                            currentRow[0]["FAX"] = DBNull.Value;
+                        else currentRow[0]["FAX"] = txtFax.Text;
+                        if (string.IsNullOrEmpty(txtComments.Text))
+                            currentRow[0]["Comments"] = DBNull.Value;
+                        else currentRow[0]["Comments"] = txtComments.Text;
+                        publishersTable.DefaultView.Sort = "Name";
+                        publishersManager.Position = publishersTable.DefaultView.Find(savedRecord);
+
+                        publishersAdapter.Update(publishersTable);
+
+                        txtName.DataBindings.Add("Text", publishersTable, "Name");
+                        txtCompanyName.DataBindings.Add("Text", publishersTable, "Company_Name");
+                        txtAddress.DataBindings.Add("Text", publishersTable, "Address");
+                        txtCity.DataBindings.Add("Text", publishersTable, "City");
+                        txtState.DataBindings.Add("Text", publishersTable, "State");
+                        txtZip.DataBindings.Add("Text", publishersTable, "Zip");
+                        txtTelephone.DataBindings.Add("Text", publishersTable, "Telephone");
+                        txtFax.DataBindings.Add("Text", publishersTable, "FAX");
+                        txtComments.DataBindings.Add("Text", publishersTable, "Comments");
+                    }
+                    else if (appState == State.Add)
+                    {
+                        publishersTable.DefaultView.Sort = "Name";
+                        publishersManager.Position = publishersTable.DefaultView.Find(savedRecord);
+                        publishersAdapter.Update(publishersTable);
+                    }
                     MessageBox.Show("Record is saved successfully", "Error Saving Record",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    setAppState(State.Add);
+                    setAppState(State.View);
                 }
             }
             catch (Exception ex)
@@ -270,11 +362,53 @@ namespace BooksManagementSystem
                 return;
             try
             {
-                
+                setAppState(State.Delete);
+                publishersManager.RemoveAt(publishersManager.Position);
+                builderComm = new OleDbCommandBuilder(publishersAdapter);
+                publishersAdapter.Update(publishersTable);
+                setAppState(State.View);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Saving Record Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnDone_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void btnFirst_Click(object sender, EventArgs e)
+        {
+            publishersManager.Position = 0;
+        }
+
+        private void btnLast_Click(object sender, EventArgs e)
+        {
+            publishersManager.Position = publishersManager.Count - 1;
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            if (txtSearch.Text.Equals("") || txtSearch.Text.Length < 3)
+            {
+                MessageBox.Show("Invalid Search", "Invalid Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            }
+            else
+            {
+                publishersTable.DefaultView.Sort = "Name";
+                var foundRows = publishersTable.Select($"Name LIKE '*{txtSearch.Text}*'");
+                if (foundRows.Length == 0)
+                {
+                    MessageBox.Show("No record found", "Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                }
+                else
+                {
+                    publishersManager.Position = publishersTable.DefaultView.Find(foundRows[0]["Name"]);
+                }
             }
         }
     }

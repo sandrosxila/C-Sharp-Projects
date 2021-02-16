@@ -57,6 +57,11 @@ namespace BooksManagementSystem
             this.btnAddNew = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnDone = new System.Windows.Forms.Button();
+            this.btnFirst = new System.Windows.Forms.Button();
+            this.btnLast = new System.Windows.Forms.Button();
+            this.txtSearch = new System.Windows.Forms.TextBox();
+            this.btnSearch = new System.Windows.Forms.Button();
+            this.lblSearch = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -135,7 +140,7 @@ namespace BooksManagementSystem
             // 
             this.txtName.Location = new System.Drawing.Point(112, 35);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(255, 20);
+            this.txtName.Size = new System.Drawing.Size(285, 20);
             this.txtName.TabIndex = 8;
             this.txtName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt_KeyPress);
             // 
@@ -143,7 +148,7 @@ namespace BooksManagementSystem
             // 
             this.txtCompanyName.Location = new System.Drawing.Point(112, 61);
             this.txtCompanyName.Name = "txtCompanyName";
-            this.txtCompanyName.Size = new System.Drawing.Size(255, 20);
+            this.txtCompanyName.Size = new System.Drawing.Size(285, 20);
             this.txtCompanyName.TabIndex = 9;
             this.txtCompanyName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt_KeyPress);
             // 
@@ -151,7 +156,7 @@ namespace BooksManagementSystem
             // 
             this.txtAddress.Location = new System.Drawing.Point(112, 87);
             this.txtAddress.Name = "txtAddress";
-            this.txtAddress.Size = new System.Drawing.Size(255, 20);
+            this.txtAddress.Size = new System.Drawing.Size(285, 20);
             this.txtAddress.TabIndex = 10;
             this.txtAddress.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt_KeyPress);
             // 
@@ -159,7 +164,7 @@ namespace BooksManagementSystem
             // 
             this.txtCity.Location = new System.Drawing.Point(112, 113);
             this.txtCity.Name = "txtCity";
-            this.txtCity.Size = new System.Drawing.Size(255, 20);
+            this.txtCity.Size = new System.Drawing.Size(285, 20);
             this.txtCity.TabIndex = 11;
             this.txtCity.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt_KeyPress);
             // 
@@ -226,13 +231,13 @@ namespace BooksManagementSystem
             // 
             this.txtComments.Location = new System.Drawing.Point(112, 243);
             this.txtComments.Name = "txtComments";
-            this.txtComments.Size = new System.Drawing.Size(255, 20);
+            this.txtComments.Size = new System.Drawing.Size(285, 20);
             this.txtComments.TabIndex = 19;
             this.txtComments.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt_KeyPress);
             // 
             // btnPrevious
             // 
-            this.btnPrevious.Location = new System.Drawing.Point(112, 269);
+            this.btnPrevious.Location = new System.Drawing.Point(135, 269);
             this.btnPrevious.Name = "btnPrevious";
             this.btnPrevious.Size = new System.Drawing.Size(75, 23);
             this.btnPrevious.TabIndex = 20;
@@ -242,7 +247,7 @@ namespace BooksManagementSystem
             // 
             // btnNext
             // 
-            this.btnNext.Location = new System.Drawing.Point(193, 269);
+            this.btnNext.Location = new System.Drawing.Point(225, 269);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(75, 23);
             this.btnNext.TabIndex = 21;
@@ -252,7 +257,7 @@ namespace BooksManagementSystem
             // 
             // btnEdit
             // 
-            this.btnEdit.Location = new System.Drawing.Point(81, 298);
+            this.btnEdit.Location = new System.Drawing.Point(135, 309);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(75, 23);
             this.btnEdit.TabIndex = 22;
@@ -262,7 +267,7 @@ namespace BooksManagementSystem
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(162, 298);
+            this.btnSave.Location = new System.Drawing.Point(225, 309);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 23;
@@ -272,7 +277,7 @@ namespace BooksManagementSystem
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(243, 298);
+            this.btnCancel.Location = new System.Drawing.Point(315, 309);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 24;
@@ -282,7 +287,7 @@ namespace BooksManagementSystem
             // 
             // btnAddNew
             // 
-            this.btnAddNew.Location = new System.Drawing.Point(81, 327);
+            this.btnAddNew.Location = new System.Drawing.Point(135, 347);
             this.btnAddNew.Name = "btnAddNew";
             this.btnAddNew.Size = new System.Drawing.Size(75, 23);
             this.btnAddNew.TabIndex = 25;
@@ -292,7 +297,7 @@ namespace BooksManagementSystem
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(162, 327);
+            this.btnDelete.Location = new System.Drawing.Point(225, 347);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(75, 23);
             this.btnDelete.TabIndex = 26;
@@ -302,18 +307,70 @@ namespace BooksManagementSystem
             // 
             // btnDone
             // 
-            this.btnDone.Location = new System.Drawing.Point(243, 327);
+            this.btnDone.Location = new System.Drawing.Point(315, 347);
             this.btnDone.Name = "btnDone";
             this.btnDone.Size = new System.Drawing.Size(75, 23);
             this.btnDone.TabIndex = 27;
             this.btnDone.Text = "Done";
             this.btnDone.UseVisualStyleBackColor = true;
+            this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
+            // 
+            // btnFirst
+            // 
+            this.btnFirst.Location = new System.Drawing.Point(54, 269);
+            this.btnFirst.Name = "btnFirst";
+            this.btnFirst.Size = new System.Drawing.Size(75, 23);
+            this.btnFirst.TabIndex = 28;
+            this.btnFirst.Text = "<|First";
+            this.btnFirst.UseVisualStyleBackColor = true;
+            this.btnFirst.Click += new System.EventHandler(this.btnFirst_Click);
+            // 
+            // btnLast
+            // 
+            this.btnLast.Location = new System.Drawing.Point(315, 269);
+            this.btnLast.Name = "btnLast";
+            this.btnLast.Size = new System.Drawing.Size(75, 23);
+            this.btnLast.TabIndex = 29;
+            this.btnLast.Text = "Last>|";
+            this.btnLast.UseVisualStyleBackColor = true;
+            this.btnLast.Click += new System.EventHandler(this.btnLast_Click);
+            // 
+            // txtSearch
+            // 
+            this.txtSearch.Location = new System.Drawing.Point(12, 321);
+            this.txtSearch.Name = "txtSearch";
+            this.txtSearch.Size = new System.Drawing.Size(117, 20);
+            this.txtSearch.TabIndex = 30;
+            // 
+            // btnSearch
+            // 
+            this.btnSearch.Location = new System.Drawing.Point(13, 347);
+            this.btnSearch.Name = "btnSearch";
+            this.btnSearch.Size = new System.Drawing.Size(93, 23);
+            this.btnSearch.TabIndex = 31;
+            this.btnSearch.Text = "Search";
+            this.btnSearch.UseVisualStyleBackColor = true;
+            this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
+            // 
+            // lblSearch
+            // 
+            this.lblSearch.AutoSize = true;
+            this.lblSearch.Location = new System.Drawing.Point(9, 305);
+            this.lblSearch.Name = "lblSearch";
+            this.lblSearch.Size = new System.Drawing.Size(105, 13);
+            this.lblSearch.TabIndex = 32;
+            this.lblSearch.Text = "Search For Publisher";
             // 
             // frmPublishers
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(379, 362);
+            this.ClientSize = new System.Drawing.Size(412, 382);
+            this.Controls.Add(this.lblSearch);
+            this.Controls.Add(this.btnSearch);
+            this.Controls.Add(this.txtSearch);
+            this.Controls.Add(this.btnLast);
+            this.Controls.Add(this.btnFirst);
             this.Controls.Add(this.btnDone);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnAddNew);
@@ -381,5 +438,10 @@ namespace BooksManagementSystem
         private System.Windows.Forms.Button btnAddNew;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Button btnDone;
+        private System.Windows.Forms.Button btnFirst;
+        private System.Windows.Forms.Button btnLast;
+        private System.Windows.Forms.TextBox txtSearch;
+        private System.Windows.Forms.Button btnSearch;
+        private System.Windows.Forms.Label lblSearch;
     }
 }

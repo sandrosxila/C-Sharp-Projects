@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BooksManagementSystem
@@ -26,6 +21,7 @@ namespace BooksManagementSystem
         private CurrencyManager authorsManager;
         private OleDbCommandBuilder builderComm;
         private bool dbError = false;
+        private int CurrentPosition { get; set; }
         private enum State
         {
             View,
@@ -51,7 +47,7 @@ namespace BooksManagementSystem
                 authorsAdapter = new OleDbDataAdapter(authorsComm);
                 authorsTable = new DataTable();
                 authorsAdapter.Fill(authorsTable);
-                txtAuthorID.DataBindings.Add("Text", authorsTable, "AU_ID", true);
+                txtAuthorID.DataBindings.Add("Text", authorsTable, "AU_ID");
                 txtAuthorName.DataBindings.Add("Text", authorsTable, "Author");
                 txtAuthorBorn.DataBindings.Add("Text", authorsTable, "Year_Born");
                 authorsManager = (CurrencyManager)BindingContext[authorsTable];
@@ -92,6 +88,7 @@ namespace BooksManagementSystem
             {
                 try
                 {
+                    var savedRecord = txtAuthorName.Text;
                     authorsManager.EndCurrentEdit();
                     builderComm = new OleDbCommandBuilder(authorsAdapter);
                     if (appState == State.Edit)
@@ -101,12 +98,13 @@ namespace BooksManagementSystem
                             authRow[0]["Year_Born"] = DBNull.Value;
                         else
                             authRow[0]["Year_Born"] = txtAuthorBorn.Text;
+                        authorsTable.DefaultView.Sort = "Author";
+                        authorsManager.Position = authorsTable.DefaultView.Find(savedRecord);
                         authorsAdapter.Update(authorsTable);
                         txtAuthorBorn.DataBindings.Add("Text", authorsTable, "Year_Born");
                     }
                     else if (appState == State.Add)
                     {
-                        var savedRecord = txtAuthorName.Text;
                         authorsTable.DefaultView.Sort = "Author";
                         authorsManager.Position = authorsTable.DefaultView.Find(savedRecord);
                         authorsAdapter.Update(authorsTable);
@@ -132,10 +130,11 @@ namespace BooksManagementSystem
 
             try
             {
+                setAppState(State.Delete);
                 authorsManager.RemoveAt(authorsManager.Position);
                 builderComm = new OleDbCommandBuilder(authorsAdapter);
                 authorsAdapter.Update(authorsTable);
-                appState = State.Delete;
+                setAppState(State.View);
             }
             catch (Exception ex)
             {
@@ -162,6 +161,10 @@ namespace BooksManagementSystem
                     btnDone.Enabled = true;
                     txtAuthorName.TabStop = false;
                     txtAuthorBorn.TabStop = false;
+                    btnFirst.Enabled = true;
+                    btnLast.Enabled = true;
+                    btnSearch.Enabled = true;
+                    txtSearch.Enabled = true;
                     break;
                 default:
                     txtAuthorID.BackColor = Color.Red;
@@ -175,6 +178,10 @@ namespace BooksManagementSystem
                     btnAddNew.Enabled = false;
                     btnDelete.Enabled = false;
                     btnDone.Enabled = false;
+                    btnFirst.Enabled = false;
+                    btnLast.Enabled = false;
+                    btnSearch.Enabled = false;
+                    txtSearch.Enabled = false;
                     txtAuthorName.Focus();
                     break;
             }
@@ -190,6 +197,7 @@ namespace BooksManagementSystem
         {
             try
             {
+                CurrentPosition = authorsManager.Position;
                 authorsManager.AddNew();
                 setAppState(State.Add);
             }
@@ -201,6 +209,13 @@ namespace BooksManagementSystem
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            authorsManager.CancelCurrentEdit();
+            if (appState == State.View)
+                txtAuthorBorn.DataBindings.Add("Text", authorsTable, "Year_Born");
+            else if (appState == State.Add)
+            {
+                authorsManager.Position = CurrentPosition;
+            }
             setAppState(State.View);
         }
 
@@ -276,6 +291,27 @@ namespace BooksManagementSystem
         private void btnDone_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            if (txtSearch.Text.Equals("") || txtSearch.Text.Length > 3)
+            {
+                MessageBox.Show("Invalid Search", "Invalid Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                authorsTable.DefaultView.Sort = "Author";
+                var foundRows = authorsTable.Select($"Author LIKE '*{txtSearch.Text}*'");
+                if (foundRows.Length == 0)
+                {
+                    MessageBox.Show("Couldn't find any record", "Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    authorsManager.Position = authorsTable.DefaultView.Find(foundRows[0]["Author"]);
+                }
+            }
         }
     }
 }
