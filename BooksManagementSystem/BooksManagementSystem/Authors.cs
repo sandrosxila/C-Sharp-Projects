@@ -310,7 +310,10 @@ namespace BooksManagementSystem
                 }
                 else
                 {
-                    authorsManager.Position = authorsTable.DefaultView.Find(foundRows[0]["Author"]);
+                    var searchForm = new frmSearch(foundRows, "Authors");
+                    searchForm.ShowDialog();
+                    var index = searchForm.Index;
+                    authorsManager.Position = authorsTable.DefaultView.Find(foundRows[index]["Author"]);
                 }
             }
         }

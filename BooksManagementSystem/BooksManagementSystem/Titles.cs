@@ -35,8 +35,8 @@ namespace BooksManagementSystem
         private OleDbCommand ISBNAuthorsComm;
         private OleDbDataAdapter ISBNAuthorsAdapter;
         private DataTable ISBNAuthorsTable;
-        private bool dbError = false;
-        private State appState;
+        private bool DBError = false;
+        private State AppState;
         private int CurrentPosition { get; set; }
 
         private enum State
@@ -97,7 +97,7 @@ namespace BooksManagementSystem
                 cboPublisher.ValueMember = "PubID";
                 cboPublisher.DataBindings.Add("SelectedValue", titlesTable, "PubID");
 
-                setAppState(State.View);
+                SetAppState(State.View);
                 GetAuthors();
             }
             catch (Exception ex)
@@ -153,22 +153,25 @@ namespace BooksManagementSystem
             else
             {
                 titlesTable.DefaultView.Sort = "Title";
-                var foundedRows = titlesTable.Select($"Title Like '*{txtFind.Text}*'");
-                if (foundedRows.Length == 0)
+                var foundRows = titlesTable.Select($"Title Like '*{txtFind.Text}*'");
+                if (foundRows.Length == 0)
                 {
                     MessageBox.Show("Record not found", "Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    titlesManager.Position = titlesTable.DefaultView.Find(foundedRows[0]["Title"]);
+                    var searchForm = new frmSearch(foundRows,"Titles");
+                    searchForm.ShowDialog();
+                    var index = searchForm.Index;
+                    titlesManager.Position = titlesTable.DefaultView.Find(foundRows[index]["Title"]);
                     GetAuthors();
                 }
             }
         }
 
-        private void setAppState(State appState)
+        private void SetAppState(State appState)
         {
-            this.appState = appState;
+            this.AppState = appState;
             switch (appState)
             {
                 case State.View:
@@ -239,13 +242,13 @@ namespace BooksManagementSystem
         private void btnEdit_Click(object sender, EventArgs e)
         {
             txtYearPublished.DataBindings.Clear();
-            setAppState(State.Edit);
+            SetAppState(State.Edit);
         }
 
         private void btnAddNew_Click(object sender, EventArgs e)
         {
             CurrentPosition = titlesManager.Position;
-            setAppState(State.Add);
+            SetAppState(State.Add);
             titlesManager.AddNew();
             for (int i = 0; i < 4; i++)
             {
@@ -256,16 +259,16 @@ namespace BooksManagementSystem
         private void btnCancel_Click(object sender, EventArgs e)
         {
             titlesManager.CancelCurrentEdit();
-            if (appState == State.View)
+            if (AppState == State.View)
             {
                 txtYearPublished.DataBindings.Add("Text", titlesTable, "Year_Published");
             }
-            else if (appState == State.Add)
+            else if (AppState == State.Add)
             {
                 titlesManager.Position = CurrentPosition;
             }
             GetAuthors();
-            setAppState(State.View);
+            SetAppState(State.View);
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -277,11 +280,11 @@ namespace BooksManagementSystem
                 return;
             try
             {
-                setAppState(State.Delete);
+                SetAppState(State.Delete);
                 titlesManager.RemoveAt(titlesManager.Position);
                 builderComm = new OleDbCommandBuilder(titlesAdapter);
                 titlesAdapter.Update(titlesTable);
-                setAppState(State.View);
+                SetAppState(State.View);
             }
             catch (Exception ex)
             {
@@ -330,7 +333,7 @@ namespace BooksManagementSystem
                     var savedRecord = txtISBN.Text;
                     titlesManager.EndCurrentEdit();
                     builderComm = new OleDbCommandBuilder(titlesAdapter);
-                    if (appState == State.Edit)
+                    if (AppState == State.Edit)
                     {
                         var titleRow = titlesTable.Select($"ISBN = '{savedRecord}'");
 
@@ -340,7 +343,7 @@ namespace BooksManagementSystem
                         titlesAdapter.Update(titlesTable);
                         txtYearPublished.DataBindings.Add("Text", titlesTable, "Year_Published");
                     }
-                    else if (appState == State.Add)
+                    else if (AppState == State.Add)
                     {
                         titlesAdapter.Update(titlesTable);
                         titlesTable.DefaultView.Sort = "Title";
@@ -353,7 +356,7 @@ namespace BooksManagementSystem
                     }
 
                     builderComm = new OleDbCommandBuilder(ISBNAuthorsAdapter);
-                    if (ISBNAuthorsTable.Rows.Count > 0 && appState == State.Edit)
+                    if (ISBNAuthorsTable.Rows.Count > 0 && AppState == State.Edit)
                     {
                         for (int i = 0; i < ISBNAuthorsTable.Rows.Count; i++)
                         {
@@ -377,7 +380,7 @@ namespace BooksManagementSystem
 
                     MessageBox.Show("Record is saved successfully", "Saving Record",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    setAppState(State.View);
+                    SetAppState(State.View);
                 }
                 catch (Exception ex)
                 {

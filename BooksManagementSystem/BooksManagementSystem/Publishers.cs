@@ -400,6 +400,9 @@ namespace BooksManagementSystem
             {
                 publishersTable.DefaultView.Sort = "Name";
                 var foundRows = publishersTable.Select($"Name LIKE '*{txtSearch.Text}*'");
+                var searchForm = new frmSearch(foundRows, "Publishers");
+                searchForm.ShowDialog();
+                var index = searchForm.Index;
                 if (foundRows.Length == 0)
                 {
                     MessageBox.Show("No record found", "Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -407,7 +410,7 @@ namespace BooksManagementSystem
                 }
                 else
                 {
-                    publishersManager.Position = publishersTable.DefaultView.Find(foundRows[0]["Name"]);
+                    publishersManager.Position = publishersTable.DefaultView.Find(foundRows[index]["Name"]);
                 }
             }
         }
