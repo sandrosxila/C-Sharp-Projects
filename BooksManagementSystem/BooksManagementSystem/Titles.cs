@@ -337,8 +337,6 @@ namespace BooksManagementSystem
                         if (string.IsNullOrEmpty(txtYearPublished.Text))
                             titleRow[0]["Year_Published"] = DBNull.Value;
                         else titleRow[0]["Year_Published"] = txtYearPublished.Text;
-                        titlesTable.DefaultView.Sort = "Title";
-                        titlesManager.Position = titlesTable.DefaultView.Find(savedRecord);
                         titlesAdapter.Update(titlesTable);
                         txtYearPublished.DataBindings.Add("Text", titlesTable, "Year_Published");
                     }
