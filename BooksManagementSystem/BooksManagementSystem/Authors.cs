@@ -165,6 +165,7 @@ namespace BooksManagementSystem
                     btnLast.Enabled = true;
                     btnSearch.Enabled = true;
                     txtSearch.Enabled = true;
+                    btnEdit.Enabled = true;
                     break;
                 default:
                     txtAuthorID.BackColor = Color.Red;
@@ -182,6 +183,7 @@ namespace BooksManagementSystem
                     btnLast.Enabled = false;
                     btnSearch.Enabled = false;
                     txtSearch.Enabled = false;
+                    btnEdit.Enabled = false;
                     txtAuthorName.Focus();
                     break;
             }
@@ -237,7 +239,6 @@ namespace BooksManagementSystem
 
         private bool ValidateInput()
         {
-            //return int.Parse(txtAuthorBorn.Text) < DateTime.Now.Year;
             string message = "";
             int inputYear, currentYear;
             bool allOK = true;
@@ -295,7 +296,7 @@ namespace BooksManagementSystem
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            if (txtSearch.Text.Equals("") || txtSearch.Text.Length > 3)
+            if (txtSearch.Text.Equals("") || txtSearch.Text.Length < 3)
             {
                 MessageBox.Show("Invalid Search", "Invalid Search", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
