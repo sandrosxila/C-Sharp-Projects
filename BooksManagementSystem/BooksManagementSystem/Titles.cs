@@ -348,12 +348,14 @@ namespace BooksManagementSystem
                         titlesTable.DefaultView.Sort = "Title";
                         var foundRecord = titlesTable.Select($"ISBN = '{savedRecord}'");
                         titlesManager.Position = titlesTable.DefaultView.Find(foundRecord[0]["Title"]);
-                        //GetAuthors();
+                        ISBNAuthorsComm = new OleDbCommand($"SELECT * FROM Title_Author WHERE ISBN = '{txtISBN.Text}'", booksConn);
+                        ISBNAuthorsAdapter = new OleDbDataAdapter(ISBNAuthorsComm);
+                        ISBNAuthorsTable = new DataTable();
+                        ISBNAuthorsAdapter.Fill(ISBNAuthorsTable);
                     }
 
-
                     builderComm = new OleDbCommandBuilder(ISBNAuthorsAdapter);
-                    if (ISBNAuthorsTable.Rows.Count > 0)
+                    if (ISBNAuthorsTable.Rows.Count > 0 && appState == State.Edit)
                     {
                         for (int i = 0; i < ISBNAuthorsTable.Rows.Count; i++)
                         {
@@ -374,11 +376,6 @@ namespace BooksManagementSystem
                         }
                     }
                     ISBNAuthorsAdapter.Update(ISBNAuthorsTable);
-
-                    //if (appState == State.Add)
-                    //{
-                    //    GetAuthors();
-                    //}
 
                     MessageBox.Show("Record is saved successfully", "Saving Record",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -447,7 +444,7 @@ namespace BooksManagementSystem
 
         private void btnAuthors_Click(object sender, EventArgs e)
         {
-            var authorForm= new frmAuthors();
+            var authorForm = new frmAuthors();
             authorForm.ShowDialog();
             authorForm.Dispose();
             booksConn.Close();
