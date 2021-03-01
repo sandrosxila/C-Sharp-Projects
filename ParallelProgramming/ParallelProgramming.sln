@@ -64,6 +64,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MergeOptionsPractice", "Mer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomAggregationPractice", "CustomAggregationPractice\CustomAggregationPractice.csproj", "{1A41F51F-7777-4CE8-9860-60124148121C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncAwaitPractice", "AsyncAwaitPractice\AsyncAwaitPractice.csproj", "{CDC753B0-3F6E-4CF7-AFF2-3628E6FCF451}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -198,5 +200,9 @@ Global
 		{1A41F51F-7777-4CE8-9860-60124148121C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A41F51F-7777-4CE8-9860-60124148121C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A41F51F-7777-4CE8-9860-60124148121C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDC753B0-3F6E-4CF7-AFF2-3628E6FCF451}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDC753B0-3F6E-4CF7-AFF2-3628E6FCF451}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDC753B0-3F6E-4CF7-AFF2-3628E6FCF451}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC753B0-3F6E-4CF7-AFF2-3628E6FCF451}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
