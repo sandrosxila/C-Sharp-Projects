@@ -31,6 +31,7 @@ namespace IObservableTPractice
         {
             var market = new Market();
             var sub = market.Inspect("market");
+            var sub2 = market.Inspect("market2");
 
             market.Publish(123);
             
